@@ -5,13 +5,14 @@
          var socket = null;
          var isopen = false;
          window.onload = function() {
-            socket = new WebSocket("ws://88.157.229.216:9000");
+            socket = new WebSocket("ws://88.157.229.216:9000/?id=1234");
             socket.binaryType = "arraybuffer";
             socket.onopen = function() {
                console.log("Connected!");
                isopen = true;
             }
             socket.onmessage = function(e) {
+                console.log('onMessage', e)
                if (typeof e.data == "string") {
                   console.log("Text message received: " + e.data);
                } else {
