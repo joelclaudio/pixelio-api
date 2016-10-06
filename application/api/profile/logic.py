@@ -6,11 +6,14 @@ def get_all_profiles():
 def get_profile_by_mac_address(mac_address):
     profile = Profile().get_profile_by_mac_address(mac_address)
     if profile is None:
-        return  False, 'profile_not_found', None
+        success, message, data = create_profile(mac_address)
+        if success:
+            return success, message, data, True
+        return  False, 'profile_not_found', None, False
     
     return  True, 'profile_fetch', {
             'id': str(profile['_id'])
-        }
+        }, False
 
 def create_profile(mac_address): 
     profile = Profile().get_profile_by_mac_address(mac_address)
