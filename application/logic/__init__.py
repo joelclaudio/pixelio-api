@@ -1,10 +1,11 @@
-from .entities import Player
+from .entities import Player 
 
 from .utils.coroutines import waitseconds
 import random
 
 
 class GameWorld(object):
+    #object {location, size}
     players = []
 
     dimensions = (1280, 800)
@@ -46,3 +47,7 @@ class GameWorld(object):
     def tick(self):
         self.update_tasks()
 
+        pass
+
+    def update_world(self):
+        pass

@@ -1,6 +1,6 @@
 import application
 
-from application.api.utils import cisco
+from application.utils import cisco
 
 from application.logic import GameWorld
 
@@ -22,7 +22,7 @@ from threading import Thread
 from time import sleep
 import cyclone.web
 from flask import Response
-from application import logic
+from application import app_logic
 
 import json
 
@@ -33,9 +33,14 @@ def send_data():
     for key, value in active_conections.iteritems():
         value.sendMessage(json.dumps({'cenas': 'altamentes'}, ensure_ascii=True).encode('utf-8'))
 
+def fetch_info():
+    app_logic.fetch_all_clients()
+    for key, value in active_conections.iteritems():
+        value.sendMessage(json.dumps(app_logic.get_game_info(key), ensure_ascii=True).encode('utf-8'))
+
 class ProfileHandler(cyclone.web.RequestHandler):
     def get(self):
-        mac_address =  self.request.uri.split('?id=')
+        mac_address =  self.request.uri.split('?macAddress=')
         if len(mac_address) > 0:
             mac_address = mac_address[len(mac_address)-1]
 
@@ -50,8 +55,8 @@ class ProfileHandler(cyclone.web.RequestHandler):
             return response_models.response_failed(message="mac_address_not_found")
 
         mac_address =  headers.get('MacAddress')
-        success, message, data = logic.create_profile(mac_address)
-        print success, message, data
+        success, message, data = app_logic.create_profile(mac_address)
+        # print success, message, data
         return success, message, data
 
 class ChannelServerProtocol(WebSocketServerProtocol):
@@ -86,21 +91,26 @@ def game_update():
     print("Cenas")
     send_data()
 
-callback_webapp = cyclone.web.Application([
-    (r"/profile", ProfileHandler)
-])
+if __name__ == '__main__':
+    callback_webapp = cyclone.web.Application([
+        (r"/profile", ProfileHandler)
+    ])
 
-from autobahn.twisted.websocket import WebSocketServerFactory
-websocket_service = WebSocketServerFactory()
-websocket_service.protocol = ChannelServerProtocol
+    from autobahn.twisted.websocket import WebSocketServerFactory
+    websocket_service = WebSocketServerFactory()
+    websocket_service.protocol = ChannelServerProtocol
 
 #subscription = LoopingCall(send_data)
 #subscription.start(0.1)
 
-data_update = LoopingCall(game_update)
-data_update.start(0.1, True)
+    data_update = LoopingCall(game_update)
+    data_update.start(0.5)
+    
+    # data_update = LoopingCall(fetch_info)
+    # data_update.start(0.5)
+    fetch_info()
 
-reactor.listenTCP(9001, websocket_service)
-reactor.listenTCP(5001, callback_webapp, interface="0.0.0.0")
+    reactor.listenTCP(9001, websocket_service)
+    reactor.listenTCP(5001, callback_webapp, interface="0.0.0.0")
 
-reactor.run()
+    reactor.run()

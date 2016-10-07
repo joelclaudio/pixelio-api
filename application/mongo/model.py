@@ -17,8 +17,9 @@ class Profile(object):
 
     def create(self, mac_address, coordinates):
         return self.collection.insert_one({
-            'mac_address': mac_address,
-            'coordinates': coordinates
+            'macAddress': mac_address,
+            'location': coordinates,
+            'size': 10
         })
         
     def get_all(self):
@@ -28,10 +29,13 @@ class Profile(object):
         return self.collection.find_one({"_id": form_id})
     
     def get_profile_by_mac_address(self, mac_address):
-        return self.collection.find_one({"mac_address": mac_address})
+        return self.collection.find_one({"macAddress": mac_address})
     
-    # def update_form_info(self, form_id, info):
-    #     return self.collection.update({'_id': form_id}, {'$set': info})
+    def update_profile(self, mac_address, location):
+        return self.collection.update({'macAddress': mac_address}, {'$set': {
+                'macAddress': mac_address,
+                'location': location
+            }})
 
     def remove_all(self):
         res = self.collection.delete_many({})
