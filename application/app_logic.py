@@ -2,6 +2,8 @@ from application.mongo.model import Profile
 from application.utils import cisco
 from application.logic import GameWorld
 
+from bson.objectid import ObjectId
+
 def get_all_profiles():
     return Profile().get_all()
 
@@ -32,9 +34,42 @@ def fetch_all_clients():
     for c in clients:
         mac_address = c.get('macAddress')
         location = c.get('mapCoordinate')
-        Profile().update_profile(mac_address, location)
-    
+        Profile().create(mac_address, location)
+
     GameWorld().update_world()
     
-def get_game_info(key):
-    return {key: 'True'}
+def get_profile_id(profile_id):
+    try:
+        return ObjectId(profile_id)
+    except:
+        return ''
+
+def get_game_info(profile_id):
+    data = Profile().get_all_active_players()
+    
+    active_player = {}
+    neighbours = []
+
+    profile = Profile().get_tmp_profile()
+    if profile is not None:
+        profile_id = str(profile['_id'])
+    
+    for d in data:
+        if str(d['_id']) == profile_id:
+            active_player = {
+                'location': d['location'],
+                'is_active': d['is_active'],
+                'size': d['size']
+            }
+        else:
+            neighbours.append({
+                'id': str(d['_id']),
+                'location': d['location'],
+                'is_active': d['is_active'],
+                'size': d['size']
+            })
+    
+    return {
+        'active_player': active_player,
+        'neighbours': neighbours
+    }    

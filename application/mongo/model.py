@@ -15,12 +15,15 @@ class Profile(object):
     def __init__(self):
         self.collection = client.pixelio.profile
 
-    def create(self, mac_address, coordinates):
-        return self.collection.insert_one({
-            'macAddress': mac_address,
-            'location': coordinates,
-            'size': 10
-        })
+    def create(self, mac_address, location):
+        if self.get_profile_by_mac_address(mac_address) is None:
+            return self.collection.insert_one({
+                'macAddress': mac_address,
+                'location': location,
+                'is_active': True,
+                'size': 10
+            })
+        return self.update_profile(mac_address, location)
 
     def get_all(self):
         return self.collection.find()
@@ -30,7 +33,13 @@ class Profile(object):
 
     def get_profile_by_mac_address(self, mac_address):
         return self.collection.find_one({"macAddress": mac_address})
-
+    
+    def get_all_active_players(self):
+        return self.collection.find()
+    
+    def get_tmp_profile(self):
+        return self.collection.find_one()
+    
     def update_profile(self, mac_address, location):
         return self.collection.update({'macAddress': mac_address}, {'$set': {
                 'macAddress': mac_address,
