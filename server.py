@@ -1,5 +1,9 @@
 import application
 
+from application.api.utils import cisco
+
+from application.logic import GameWorld
+
 from flask import Flask
 from twisted.internet import reactor
 from twisted.web.proxy import ReverseProxyResource
@@ -73,6 +77,12 @@ class ChannelServerProtocol(WebSocketServerProtocol):
         del active_conections[self.http_request_params['id'][0]]
         print("WebSocket connection closed: {0}".format(reason))
 
+game = GameWorld()
+
+game.start()
+
+def game_update():
+    pass
 
 callback_webapp = cyclone.web.Application([
     (r"/profile", ProfileHandler)
@@ -84,6 +94,9 @@ websocket_service.protocol = ChannelServerProtocol
 
 subscription = LoopingCall(send_data)
 subscription.start(1)
+
+data_update = LoopingCall(game_update)
+data_update.start(0.5)
 
 reactor.listenTCP(9001, websocket_service)
 reactor.listenTCP(5001, callback_webapp, interface="0.0.0.0")
