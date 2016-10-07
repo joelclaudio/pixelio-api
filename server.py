@@ -83,6 +83,7 @@ game.start()
 
 def game_update():
     game.tick()
+    print("Cenas")
     send_data()
 
 callback_webapp = cyclone.web.Application([
@@ -97,7 +98,7 @@ websocket_service.protocol = ChannelServerProtocol
 #subscription.start(0.1)
 
 data_update = LoopingCall(game_update)
-data_update.start(0.1)
+data_update.start(0.1, True)
 
 reactor.listenTCP(9001, websocket_service)
 reactor.listenTCP(5001, callback_webapp, interface="0.0.0.0")

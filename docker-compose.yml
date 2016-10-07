@@ -3,3 +3,8 @@ pixels:
   ports:
     - "9001:9001"
     - "5001:5001"
+
+mongo:
+  image: mongo:latest
+  ports:
+    - "27017:27017"
