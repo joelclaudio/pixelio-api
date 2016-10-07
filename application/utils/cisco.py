@@ -35,4 +35,4 @@ def tick():
 
     #print(len(clients))
 
-tick()
+# tick()
