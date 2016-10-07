@@ -5,6 +5,8 @@ pixels:
     - "5001:5001"
   environment:
     FORMS_MONGO_HOST: mongo
+  volumes:
+   - .:/usr/src/app
   links:
     - mongo:mongo
   tty: true

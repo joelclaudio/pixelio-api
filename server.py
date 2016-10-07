@@ -31,7 +31,8 @@ encoding_hash = {}
 
 def send_data():
     for key, value in active_conections.iteritems():
-        value.sendMessage(json.dumps({'comida': game.food}, ensure_ascii=True).encode('utf-8'))
+        print(len(game.food))
+        value.sendMessage(json.dumps({'comida': map(lambda f: {"x": f[0], "y": f[1], "color": f[2]}, game.food)}, ensure_ascii=True).encode('utf-8'))
 
 def fetch_info():
     app_logic.fetch_all_clients()
