@@ -43,6 +43,6 @@ class GameWorld(object):
             except StopIteration:
                 self.tasks.remove(task)
 
-    def tick(self, dt):
+    def tick(self):
         self.update_tasks()
 

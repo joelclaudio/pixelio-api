@@ -82,7 +82,8 @@ game = GameWorld()
 game.start()
 
 def game_update():
-    pass
+    game.tick()
+    send_data()
 
 callback_webapp = cyclone.web.Application([
     (r"/profile", ProfileHandler)
@@ -92,11 +93,11 @@ from autobahn.twisted.websocket import WebSocketServerFactory
 websocket_service = WebSocketServerFactory()
 websocket_service.protocol = ChannelServerProtocol
 
-subscription = LoopingCall(send_data)
-subscription.start(1)
+#subscription = LoopingCall(send_data)
+#subscription.start(0.1)
 
 data_update = LoopingCall(game_update)
-data_update.start(0.5)
+data_update.start(0.1)
 
 reactor.listenTCP(9001, websocket_service)
 reactor.listenTCP(5001, callback_webapp, interface="0.0.0.0")
