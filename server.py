@@ -38,17 +38,17 @@ class ProfileHandler(cyclone.web.RequestHandler):
         mac_address =  self.request.uri.split('?id=')
         if len(mac_address) > 0:
             mac_address = mac_address[len(mac_address)-1]
-        
+
 
         success, message, data, created = logic.get_profile_by_mac_address(mac_address)
         print success, message, data, created
         return success, message, data, created
-        
+
     def post(self):
         headers = self.request.headers
         if 'MacAddress' not in headers:
             return response_models.response_failed(message="mac_address_not_found")
-        
+
         mac_address =  headers.get('MacAddress')
         success, message, data = logic.create_profile(mac_address)
         print success, message, data
