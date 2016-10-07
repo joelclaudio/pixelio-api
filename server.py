@@ -1,4 +1,3 @@
-from application import app 
 import application
 
 from flask import Flask
@@ -18,26 +17,39 @@ import random
 from threading import Thread
 from time import sleep
 import cyclone.web
+from flask import Response
+from application import logic
+
+import json
 
 active_conections = {}
 encoding_hash = {}
 
 def send_data():
-    print 'send_data'
     for key, value in active_conections.iteritems():
         value.sendMessage(json.dumps({'cenas': 'altamentes'}, ensure_ascii=True).encode('utf-8'))
 
-class OrionCallbackHandler(cyclone.web.RequestHandler):
+class ProfileHandler(cyclone.web.RequestHandler):
     def get(self):
-        print 'get'
-        return {'cenas': True}
-        # for client in clients:
-        #     client.sendMessage(payload, isBinary=False)
-
-    def post(self):
-        print 'post'
-        return {'cenas': True}
+        mac_address =  self.request.uri.split('?id=')
+        if len(mac_address) > 0:
+            mac_address = mac_address[len(mac_address)-1]
         
+
+        success, message, data, created = logic.get_profile_by_mac_address(mac_address)
+        print success, message, data, created
+        return success, message, data, created
+        
+    def post(self):
+        headers = self.request.headers
+        if 'MacAddress' not in headers:
+            return response_models.response_failed(message="mac_address_not_found")
+        
+        mac_address =  headers.get('MacAddress')
+        success, message, data = logic.create_profile(mac_address)
+        print success, message, data
+        return success, message, data
+
 class ChannelServerProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
@@ -63,11 +75,11 @@ class ChannelServerProtocol(WebSocketServerProtocol):
 
 
 callback_webapp = cyclone.web.Application([
-    (r"/", OrionCallbackHandler),
-    (r"/updateCounter", OrionCallbackHandler)
-    ])
+    (r"/profile", ProfileHandler)
+])
+
 from autobahn.twisted.websocket import WebSocketServerFactory
-websocket_service = WebSocketServerFactory("ws://88.157.229.216:9000")
+websocket_service = WebSocketServerFactory()
 websocket_service.protocol = ChannelServerProtocol
 
 subscription = LoopingCall(send_data)

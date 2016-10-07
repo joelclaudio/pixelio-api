@@ -1,4 +1,4 @@
-from application.api.mongo.model import Profile
+from application.mongo.model import Profile
 
 def get_all_profiles():
     return Profile().get_all()
