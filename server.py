@@ -87,8 +87,8 @@ game = GameWorld()
 game.start()
 
 def game_update():
-    game.tick()
     print("Cenas")
+    game.tick()
     send_data()
 
 if __name__ == '__main__':
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     data_update = LoopingCall(game_update)
     data_update.start(0.5)
-    
+
     # data_update = LoopingCall(fetch_info)
     # data_update.start(0.5)
     fetch_info()

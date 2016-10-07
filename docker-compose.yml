@@ -3,6 +3,10 @@ pixels:
   ports:
     - "9001:9001"
     - "5001:5001"
+  environment:
+    FORMS_MONGO_HOST: mongo
+  links:
+    - mongo:mongo
 
 mongo:
   image: mongo:latest
