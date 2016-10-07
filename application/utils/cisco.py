@@ -34,5 +34,3 @@ def tick():
     print(hash(freeze(clients)))
 
     #print(len(clients))
-
-# tick()

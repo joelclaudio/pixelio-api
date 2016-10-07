@@ -44,15 +44,16 @@ class ProfileHandler(cyclone.web.RequestHandler):
         if len(mac_address) > 0:
             mac_address = mac_address[len(mac_address)-1]
 
-        success, message, data, created = app_logic.get_profile_by_mac_address(mac_address)
-        # print success, message, data, created
+
+        success, message, data, created = logic.get_profile_by_mac_address(mac_address)
+        print success, message, data, created
         return success, message, data, created
-        
+
     def post(self):
         headers = self.request.headers
         if 'MacAddress' not in headers:
             return response_models.response_failed(message="mac_address_not_found")
-        
+
         mac_address =  headers.get('MacAddress')
         success, message, data = app_logic.create_profile(mac_address)
         # print success, message, data
@@ -86,7 +87,8 @@ game = GameWorld()
 game.start()
 
 def game_update():
-    pass
+    game.tick()
+    send_data()
 
 if __name__ == '__main__':
     callback_webapp = cyclone.web.Application([
@@ -97,8 +99,8 @@ if __name__ == '__main__':
     websocket_service = WebSocketServerFactory()
     websocket_service.protocol = ChannelServerProtocol
 
-    subscription = LoopingCall(send_data)
-    subscription.start(1)
+#subscription = LoopingCall(send_data)
+#subscription.start(0.1)
 
     data_update = LoopingCall(game_update)
     data_update.start(0.5)
