@@ -1,10 +1,13 @@
 import time
 
 def waitseconds(seconds):
-    starttime = time.clock()
+    starttime = time.time()
 
+    print("I need to wait "+str(seconds))
     while True:
         yield None
 
-        if time.clock() - starttime >= seconds:
+        diff = time.time() - starttime
+
+        if  diff >= seconds:
             return
